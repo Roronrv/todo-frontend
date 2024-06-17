@@ -12,6 +12,7 @@ function App() {
       try {
         const response = await fetchTodos();
         setTodos(response.data);
+        console.log("rep:",response.data);
       } catch (error) {
         console.error('Error fetching todos:', error);
       }
@@ -23,7 +24,7 @@ function App() {
   const handleCreateTodo = async () => {
     if (newTodo.trim() === '') return;
     try {
-      const response = await createTodo({ item: newTodo });
+      const response = await createTodo({ Item: newTodo });
       setTodos([...todos, response.data]);
       setNewTodo('');
     } catch (error) {
@@ -31,20 +32,22 @@ function App() {
     }
   };
 
-  const handleEditTodo = (id, item) => {
+  const handleEditTodo = (id, Item) => {
     setIsEditing(true);
     setCurrentTodoId(id);
-    setNewTodo(item);
+    setNewTodo(Item);
   };
 
   const handleUpdateTodo = async () => {
     if (newTodo.trim() === '') return;
     try {
-      const response = await updateTodo(currentTodoId, { item: newTodo });
-      const updatedTodos = todos.map((todo) =>
-        todo.id === currentTodoId ? response.data : todo
+      const response = await updateTodo(currentTodoId, { Item: newTodo });
+      const updatedTodo = response.data;
+      setTodos(prevTodos =>
+        prevTodos.map(todo =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        )
       );
-      setTodos(updatedTodos);
       setNewTodo('');
       setIsEditing(false);
       setCurrentTodoId(null);
@@ -52,6 +55,7 @@ function App() {
       console.error('Error updating todo:', error);
     }
   };
+  
 
   const handleDeleteTodo = async (id) => {
     try {
@@ -78,8 +82,8 @@ function App() {
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
-            {todo.attributes.item}
-            <button onClick={() => handleEditTodo(todo.id, todo.attributes.item)}>Edit</button>
+            {todo.attributes.Item}
+            <button onClick={() => handleEditTodo(todo.id, todo.attributes.Item)}>Edit</button>
             <button onClick={() => handleDeleteTodo(todo.id)}>Delete</button>
           </li>
         ))}
